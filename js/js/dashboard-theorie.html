@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAB Theorie Dashboard</title>
+</head>
+<body>
+  <h1>VAB Theorie Dashboard</h1>
+
+  <p>Zoek een certificaat op:</p>
+  <input type="text" id="cert-code" placeholder="Certificaatcode">
+  <button id="check-cert">Zoek</button>
+
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.5.0/dist/supabase.min.js"></script>
+  <script>
+    // 🔹 Supabase verbinding
+    const supabaseUrl = 'https://eu-rp-webapp-1ah1i7lr2-europese-roleplays-projects.supabase.co';
+    const supabaseKey = 'sb_publishable_h6cp0ZsmA8kD73yCp2flQA_zA9dg04L';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    document.getElementById('check-cert').addEventListener('click', async () => {
+      const code = document.getElementById('cert-code').value;
+      const { data, error } = await supabase
+        .from('certificates')
+        .select('*')
+        .eq('cert_code', code)
+        .single();
+
+      const resultDiv = document.getElementById('result');
+
+      if (error || !data) {
+        resultDiv.innerHTML = 'Certificaat niet gevonden';
+        return;
+      }
+
+      resultDiv.innerHTML = `
+        <p>Naam speler: ${data.player_name}</p>
+        <p>Rijbewijs type: ${data.license_type}</p>
+        <p>Score: ${data.score}</p>
+        <p>Datum: ${data.date}</p>
+      `;
+    });
+  </script>
+</body>
+</html>
